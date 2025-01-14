@@ -1,0 +1,26 @@
+<!Docktype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Base64 Strings</title>
+</head>
+<body>
+    <h1>Store Base64 Encoded Strings</h1>
+    <form id="textForm">
+        <label for="text">Enter Text:</label>
+        <input type="text" id="text" name="text" required>
+        <br><br>
+        <button type="button" id="mongoButton">Save to MongoDB</button>
+        <button type="button" id="mysqlButton">Save to MySQL</button>
+    </form>
+    <h2>Data</h2>
+    <button type="button" id="fetchMongoButton">Show MongoDB Data</button>
+    <button type="button" id="fetchMySQLButton">Show MySQL Data</button>
+    <div id="dataDisplay">
+        <h3>Data Display</h3>
+        <ul id="dataList"></ul>
+    </div>
+    <script src="./static/script.js"></script>
+</body>
+</html>

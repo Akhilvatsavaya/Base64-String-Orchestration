@@ -1,0 +1,121 @@
+1. Create a minikube cluster
+
+minikube start
+
+2. Set the docker environment
+
+& minikube docker-env | Invoke-Expression
+
+3. Check status of minikube
+
+minikube status
+
+4. Build the frontend-image from the frontend directory
+
+docker build -t frontend-image .
+
+5. Create the frontend-service 
+
+kubectl apply -f .\frontend-service.yaml
+
+6. Create the frontend-deployment
+
+kubectl apply -f .\frontend-deployment.yaml
+
+7. Wait for the container to deploy and run
+
+kubectl get pods
+kubectl get svc
+
+8. Navigate to backend folder
+
+9. Build the backend image
+
+docker build -t backend-image .
+
+10. Go to Orchestration files dir
+
+11. Create the backend service
+
+kubectl apply -f .\backend-service.yaml
+
+12. Create the backend-deployment
+
+kubectl apply -f .\backend-deployment.yaml
+
+13. Wait for the pods to be created
+
+14. Go to Mongo dir and deploy the headless-service, pvs and statefulset
+
+kubectl apply -f .\mongodb-headless-service.yaml
+
+kubectl apply -f .\mongo-pv.yaml
+
+kubectl apply -f .\mongodb-statefulset.yaml
+
+Substeps for mongo setup
+
+---------------------------------------------------------------------------------------------------------------------
+After creating the headless service, pvs and statefulset
+Go into the mongodb-0 pod to initialize the replica set
+
+Command - kubectl exec -it mongodb-0 -- mongosh
+
+Then initiate the replicaset using this command in mongosh
+
+rs.initiate({
+  _id: "rs0", // Name of the replica set (matches the "--replSet rs0" argument)
+  members: [
+    { _id: 0, host: "mongodb-0.mongodb-service.default.svc.cluster.local:27017" },
+    { _id: 1, host: "mongodb-1.mongodb-service.default.svc.cluster.local:27017" }
+  ]
+})
+
+
+Later check the status of replicaset
+
+Command : rs.status()
+
+
+Here, check for the pods and which is primary and secondary
+
+mongodb-0 : primary
+mongodb-1 : secondary
+
+If it is the other way, its fine if you leave it but if you want to change
+exec into the primary pod and use this command : rs.stepDown()
+
+It will make the current pod step down and re-election happens for new primary
+
+Example Connection strings:
+
+- Write to Primary : mongodb://mongodb-0.mongodb-service.default.svc.cluster.local:27017
+
+- Read from secondary : mongodb://mongodb-1.mongodb-service.default.svc.cluster.local:27017?readPreference=secondary
+
+------------------------------------------------------------------------------------------------------------------------
+
+15. Wait for the pods to be created and running
+
+16. Do the same for MySQL
+
+kubectl apply -f .\mysql-headless-service.yaml
+
+kubectl apply -f .\mysql-pv.yaml
+
+kubectl apply -f .\mysql-statefulset.yaml
+
+17. Go back to orchestration files dir and setup ingress for routing
+
+Before setup enable ingress in minikube -> minikube addons enable ingress
+Check if enabled -> minikube addons list
+
+kubectl apply -f .\ingress.yaml
+
+18. Setup a minikube tunnel to route traffic
+
+minikube tunnel
+
+Logs for tunnel - minikube tunnel --logtostderr
+
+Tunnel can be accessed from 127.0.0.1

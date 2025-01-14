@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  serviceName: "mysql-service" # Headless service
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "9292"
+        - name: MYSQL_DATABASE
+          value: "testdb" # Pre-creates the database
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql # Mounting PVCs dynamically
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-storage
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi # Matches the pre-created PVs
+      selector:
+        matchLabels:
+          type: mysql-storage # Match the labels on the existing PVs
